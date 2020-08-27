@@ -1,0 +1,6 @@
+include ':MovieInfo'
+include ':MovieSplash'
+include ':AppNavigator'
+include ':Core'
+include ':MovieApp'
+rootProject.name = "MultiModuleMovieApp"
