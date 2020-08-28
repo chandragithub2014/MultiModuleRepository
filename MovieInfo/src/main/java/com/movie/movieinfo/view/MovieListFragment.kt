@@ -2,22 +2,22 @@ package com.movie.movieinfo.view
 
 import android.os.Bundle
 import android.text.TextUtils
-import androidx.fragment.app.Fragment
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
+import android.view.*
 import android.widget.Toast
+import androidx.appcompat.widget.Toolbar
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.fragment.app.viewModels
 import androidx.lifecycle.LifecycleOwner
-import com.movie.movieinfo.R
-import com.movie.movieinfo.viewmodel.MovieDataViewModel
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
-import dagger.hilt.EntryPoint
-import dagger.hilt.InstallIn
+import com.movie.core.base.BaseFragment
+import com.movie.movieinfo.R
+import com.movie.movieinfo.viewmodel.MovieDataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_movie_list.*
+import com.movie.core.basemodel.MenuItem
+import java.util.*
+
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -30,7 +30,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 @AndroidEntryPoint
-class MovieListFragment : Fragment(),LifecycleOwner {
+class MovieListFragment : BaseFragment(),LifecycleOwner {
     // TODO: Rename and change types of parameters
    // private val movieViewModel: MovieDataViewModel by viewModels()
     private val movieViewModel by activityViewModels<MovieDataViewModel>()
@@ -46,6 +46,7 @@ class MovieListFragment : Fragment(),LifecycleOwner {
             param1 = it.getString(ARG_PARAM1)
             param2 = it.getString(ARG_PARAM2)
         }
+
     }
 
     override fun onCreateView(
@@ -59,14 +60,29 @@ class MovieListFragment : Fragment(),LifecycleOwner {
 
     override fun onResume() {
         super.onResume()
+        prepareAndSetMenuList()
         movieViewModel.fetchMovieData()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        val toolbar: Toolbar = view.findViewById(R.id.toolBar) as Toolbar
+        //setHasOptionsMenu(true)
+        initToolBar(toolbar,"Movie List")
         initAdapter()
         observeViewModel()
     }
+
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+
+    }
+
+
+  /*  override fun onCreateOptionsMenu(menu: Menu?, inflater: MenuInflater) {
+        inflater.inflate(R.menu.toolbar_menu, menu)
+        super.onCreateOptionsMenu(menu!!, inflater)
+    }*/
     private fun observeViewModel() {
         movieViewModel.fetchMoviesLiveData().observe(viewLifecycleOwner, Observer {
             it?.let {
@@ -97,6 +113,19 @@ class MovieListFragment : Fragment(),LifecycleOwner {
             layoutManager = LinearLayoutManager(context)
             adapter = movieListAdapter
         }
+    }
+
+    override fun useToolbar(): Boolean {
+        return true
+    }
+
+    private fun prepareAndSetMenuList(){
+        val menuList = mutableListOf<MenuItem>()
+        menuList.add(MenuItem("Sort By Year"))
+        menuList.add(MenuItem("Sort By Name"))
+        menuList.add(MenuItem("Sort By Rating"))
+        setMenuList(menuList)
+
     }
     companion object {
         /**
