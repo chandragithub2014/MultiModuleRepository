@@ -67,7 +67,8 @@ open  class BaseFragment : Fragment() {
         menu.clear();
          //menu.add(0, MENU_ADD, Menu.NONE, R.string.your-add-text).setIcon(R.drawable.your-add-icon);
         for(menuItem in menuItemList){
-            menu.add(menuItem.itemName)
+            menu.add(0,menuItem.itemId,Menu.NONE,menuItem.itemName)
+
         }
         super.onPrepareOptionsMenu(menu)
     }

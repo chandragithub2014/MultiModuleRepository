@@ -31,5 +31,6 @@ class SplashActivity : AppCompatActivity() {
 
     private fun launchMovieInfoModule(){
         this?.openActivity(Class.forName("com.movie.movieinfo.view.MovieInfoActivity"))
+        finish()
     }
 }

@@ -1,10 +1,14 @@
 package com.movie.common.di
 
+import android.content.Context
 import com.movie.common.util.NetworkUtil
+import com.movie.core.roomDB.MovieDB
+import com.movie.core.roomDB.MovieDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import dagger.hilt.android.qualifiers.ApplicationContext
 import okhttp3.OkHttpClient
 import okhttp3.logging.HttpLoggingInterceptor
 import retrofit2.Retrofit
@@ -40,5 +44,8 @@ object NetworkModule {
     @Provides
     fun provideRetrofit(baseUrl: String, okHttpClient: OkHttpClient) = Retrofit.Builder().baseUrl(baseUrl).client(okHttpClient).addConverterFactory(GsonConverterFactory.create()).build()
 
-
+    @Provides
+    fun provideMovieDao(@ApplicationContext appContext: Context) : MovieDao {
+        return MovieDB.getInstance(appContext).movieDao
+    }
 }

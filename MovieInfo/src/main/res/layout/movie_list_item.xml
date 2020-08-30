@@ -62,5 +62,24 @@
             app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
             tools:text="2012"
             />
+
+        <TextView
+            android:id="@+id/rating_text"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginEnd="16dp"
+            android:layout_marginBottom="2dp"
+            android:layout_marginTop="10dp"
+            android:textAppearance="@style/TextAppearance.AppCompat.Body2"
+            android:textColor="#8A000000"
+            app:layout_constraintStart_toEndOf="@+id/avatar_image"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@+id/avatar_image"
+            app:layout_constraintTop_toBottomOf="@+id/year_text"
+            tools:text="t123444"
+            />
+
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

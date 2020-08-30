@@ -1,3 +1,3 @@
 package com.movie.core.basemodel
 
-data class MenuItem(val itemName:String)
+data class MenuItem(val itemId:Int,val itemName:String)

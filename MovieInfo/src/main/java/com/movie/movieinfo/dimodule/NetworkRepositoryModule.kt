@@ -3,6 +3,7 @@ package com.movie.info.dimodules
 import com.hilt.demo.repository.CoroutineHelper
 import com.hilt.demo.repository.NetworkRepository
 import com.movie.common.util.NetworkUtil
+import com.movie.core.roomDB.MovieDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -15,7 +16,7 @@ import retrofit2.Retrofit
 object NetworkRepositoryModule {
 
     @Provides
-    fun provideRepository(apiService: NetworkAPIService) = NetworkRepository(apiService)
+    fun provideRepository(apiService: NetworkAPIService,movieDao: MovieDao) = NetworkRepository(apiService,movieDao)
 
     @Provides
     fun provideCoroutineDispatcher() = CoroutineHelper().fetchCoroutineDispatcher()
@@ -23,4 +24,6 @@ object NetworkRepositoryModule {
 
     @Provides
     fun provideAPIService(retrofit: Retrofit) = retrofit.create(NetworkAPIService::class.java)
+
+
 }

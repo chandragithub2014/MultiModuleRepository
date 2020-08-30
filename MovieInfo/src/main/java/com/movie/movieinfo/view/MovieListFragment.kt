@@ -2,6 +2,7 @@ package com.movie.movieinfo.view
 
 import android.os.Bundle
 import android.text.TextUtils
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
@@ -11,12 +12,11 @@ import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.movie.core.base.BaseFragment
+import com.movie.core.basemodel.MenuItem
 import com.movie.movieinfo.R
 import com.movie.movieinfo.viewmodel.MovieDataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_movie_list.*
-import com.movie.core.basemodel.MenuItem
-import java.util.*
 
 
 // TODO: Rename parameter arguments, choose names that match
@@ -61,7 +61,8 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
     override fun onResume() {
         super.onResume()
         prepareAndSetMenuList()
-        movieViewModel.fetchMovieData()
+        //movieViewModel.fetchMovieData()
+        movieViewModel.fetchMovieDataByTitleASC()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -83,18 +84,16 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
         inflater.inflate(R.menu.toolbar_menu, menu)
         super.onCreateOptionsMenu(menu!!, inflater)
     }*/
-    private fun observeViewModel() {
-        movieViewModel.fetchMoviesLiveData().observe(viewLifecycleOwner, Observer {
-            it?.let {
-                println("Response From Network :::: $it")
-                 movieListAdapter?.refreshAdapter(it.Search)
-            }
-        })
 
+
+    private fun observeViewModel() {
+        Log.d("MovieListFragment","In Observe View Model")
         movieViewModel.fetchLoadStatus().observe(viewLifecycleOwner, Observer {
             if (!it) {
                 println(it)
                 progressBar.visibility = View.GONE
+            }else{
+                progressBar.visibility = View.VISIBLE
             }
         })
 
@@ -102,11 +101,29 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
             it?.let {
                 if (!TextUtils.isEmpty(it)) {
                     Toast.makeText(context, "$it", Toast.LENGTH_LONG).show()
+                }else{
+                    observeResponse()
                 }
             }
         })
     }
 
+    private fun observeResponse(){
+        movieViewModel.movieListFromLocal.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                println("Response From LocalDb :::: $it")
+                if(it.size > 0 ) {
+                    movieListAdapter?.refreshAdapter(it)
+
+                }else{
+                    progressBar.visibility = View.VISIBLE
+                    movieViewModel.fetchMovieData()
+
+                }
+
+            }
+        })
+    }
     private fun initAdapter() {
         movieListAdapter = MovieListAdapter(this@MovieListFragment.requireActivity(),arrayListOf())
         recyclerView.apply {
@@ -118,15 +135,41 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
     override fun useToolbar(): Boolean {
         return true
     }
+    private val MENU_SORT_BY_YEAR = Menu.FIRST
+    private val MENU_SORT_BY_TITLE_DESC: Int = Menu.FIRST + 1
+    private val MENU_SORT_BY_RATING: Int = Menu.FIRST + 2
 
     private fun prepareAndSetMenuList(){
         val menuList = mutableListOf<MenuItem>()
-        menuList.add(MenuItem("Sort By Year"))
-        menuList.add(MenuItem("Sort By Name"))
-        menuList.add(MenuItem("Sort By Rating"))
+        menuList.add(MenuItem(MENU_SORT_BY_YEAR,"Sort By Year"))
+        menuList.add(MenuItem(MENU_SORT_BY_TITLE_DESC,"Sort By Title"))
+        menuList.add(MenuItem(MENU_SORT_BY_RATING,"Sort By Rating"))
         setMenuList(menuList)
 
     }
+
+    override fun onOptionsItemSelected(item: android.view.MenuItem): Boolean {
+        super.onOptionsItemSelected(item)
+        when (item.itemId) {
+            MENU_SORT_BY_YEAR -> {
+                movieViewModel.fetchMovieDataByYearASC()
+                observeResponse()
+            }
+            MENU_SORT_BY_TITLE_DESC -> {
+                movieViewModel.fetchMovieDataByTitleDesc()
+                observeResponse()
+            }
+            MENU_SORT_BY_RATING -> {
+                movieViewModel.fetchMovieDataByImdbASC()
+                observeResponse()
+            }
+
+
+        }
+        return false
+    }
+
+
     companion object {
         /**
          * Use this factory method to create a new instance of
