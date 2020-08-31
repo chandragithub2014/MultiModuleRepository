@@ -17,6 +17,8 @@ class NetworkRepository @Inject constructor(private val apiService: NetworkAPISe
     fun fetchMoviesSortByImdbAsc() = movieDao.fetchByImdbAsc()
     fun fetchMoviesSortByYearAsc() = movieDao.fetchByYearAsc()
     fun fetchMoviesSortByTitleDesc() = movieDao.fetchByTitleDesc()
+    suspend fun fetchMovieInfoBasedOnImdbId(imdbId : String) = movieDao.fetchMovieInfo(imdbId)
+    suspend fun updateFavoriteMovieForImdb_id(favourite:Boolean,imdbId: String) : Int = movieDao.update_favourite(favourite,imdbId)
     suspend fun insertToLocalDB(movieInfo : MutableList<Movie>) {
         movieDao.insertMovieInfo(movieInfo)
     }

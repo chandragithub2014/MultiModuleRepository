@@ -17,6 +17,7 @@ class MovieDataViewModel @ViewModelInject constructor(private val dispatcher: Co
     private val errorOnAPI = MutableLiveData<String>()
     var movieListMutableLiveData = MutableLiveData<MovieModel>()
     var movieListFromLocal: LiveData<MutableList<Movie>> = MutableLiveData<MutableList<Movie>>()
+    var movieInfo  = MutableLiveData<Movie>()
 
     fun fetchMovieData() {
         loading.postValue(true)
@@ -49,7 +50,7 @@ class MovieDataViewModel @ViewModelInject constructor(private val dispatcher: Co
             val searchResults = movieModel.Search
 
             for(i in searchResults){
-                val movie = Movie(i.Poster,i.Title,i.Type,i.Year,i.imdbID,response,results)
+                val movie = Movie(i.Poster,i.Title,i.Type,i.Year,i.imdbID,false,response,results)
                 movieList.add(movie)
             }
         }
@@ -142,10 +143,43 @@ class MovieDataViewModel @ViewModelInject constructor(private val dispatcher: Co
 
     }
 
+     fun fetchMovieById(imdb : String){
+        viewModelScope.launch(dispatcher) {
+            try {
+                val movieInfo_detail = networkRepository.fetchMovieInfoBasedOnImdbId(imdb)
+                println("Movie Info For Imdb_Id ${movieInfo_detail}")
+                movieInfo.postValue(movieInfo_detail)
+                loading.postValue(false)
+                errorOnAPI.postValue("")
+            } catch (e: Exception) {
+                e.printStackTrace()
+                loading.postValue(false)
+                errorOnAPI.postValue("Something went wrong::${e.localizedMessage}")
+            }
+        }
+    }
 
+     fun updateFavouriteMovie(favourite : Boolean, imdbId:String){
+         viewModelScope.launch(dispatcher) {
+             try {
+              val updated_id = networkRepository.updateFavoriteMovieForImdb_id(favourite,imdbId)
+                 if(updated_id > 0){
+                     loading.postValue(false)
+                     errorOnAPI.postValue("")
+                 }else{
+                     loading.postValue(false)
+                     errorOnAPI.postValue("Update Failed")
+                 }
+             }catch (e: Exception) {
+                 e.printStackTrace()
+                 loading.postValue(false)
+                 errorOnAPI.postValue("Something went wrong::${e.localizedMessage}")
+             }
+         }
+     }
     fun fetchError(): LiveData<String> = errorOnAPI
     fun fetchLoadStatus(): LiveData<Boolean> = loading
     fun fetchMoviesLiveData(): LiveData<MovieModel> = movieListMutableLiveData
-
+    fun fetchMovieDetail():LiveData<Movie> = movieInfo
 
 }

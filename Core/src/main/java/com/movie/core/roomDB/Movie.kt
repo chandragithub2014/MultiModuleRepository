@@ -18,6 +18,8 @@ data class Movie(
     @PrimaryKey
     @ColumnInfo(name = "imbdb")
     val imdbID: String,
+    @ColumnInfo(name = "favourite")
+    val favourite: Boolean,
     @ColumnInfo(name = "response")
     val Response: String,
     @ColumnInfo(name = "total_results")

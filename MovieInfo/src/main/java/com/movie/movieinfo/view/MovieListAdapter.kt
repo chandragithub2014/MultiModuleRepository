@@ -12,7 +12,7 @@ import com.movie.info.model.Search
 import com.movie.movieinfo.R
 import kotlinx.android.synthetic.main.movie_list_item.view.*
 
-class MovieListAdapter(var context: Context,var movieList: ArrayList<Movie>) : RecyclerView.Adapter<MovieListAdapter.PostViewHolder>() {
+class MovieListAdapter(var context: Context,var movieList: ArrayList<Movie>,var onItemClickListner: OnItemClickListner) : RecyclerView.Adapter<MovieListAdapter.PostViewHolder>() {
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int) = PostViewHolder(LayoutInflater.from(parent.context).inflate(
         R.layout.movie_list_item, parent, false))
 
@@ -33,12 +33,18 @@ class MovieListAdapter(var context: Context,var movieList: ArrayList<Movie>) : R
         private val title = view.title_text
         private val imagePoster = view.avatar_image
         private val rating = view.rating_text
+        private val fav_img = view.imageView3
 
         fun bind(model: Movie) {
             Log.d("PostAdapter", "In bind() method.......")
             title.text = model.Title
             year.text = model.Year
             rating.text = model.imdbID
+            if(model.favourite){
+                fav_img.visibility = View.VISIBLE
+            }else{
+                fav_img.visibility = View.INVISIBLE
+            }
 
             Glide
                 .with(context)
@@ -46,6 +52,9 @@ class MovieListAdapter(var context: Context,var movieList: ArrayList<Movie>) : R
                 .centerCrop()
                 .placeholder(R.drawable.ic_launcher)
                 .into(imagePoster);
+            layout.setOnClickListener {
+                onItemClickListner.navigateToDetail(model.imdbID)
+            }
         }
     }
 }

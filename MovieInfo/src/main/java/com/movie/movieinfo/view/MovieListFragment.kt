@@ -15,6 +15,7 @@ import com.movie.core.base.BaseFragment
 import com.movie.core.basemodel.MenuItem
 import com.movie.movieinfo.R
 import com.movie.movieinfo.viewmodel.MovieDataViewModel
+import com.mvvm.appnavigator.replaceFragment
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.android.synthetic.main.fragment_movie_list.*
 
@@ -30,7 +31,7 @@ private const val ARG_PARAM2 = "param2"
  * create an instance of this fragment.
  */
 @AndroidEntryPoint
-class MovieListFragment : BaseFragment(),LifecycleOwner {
+class MovieListFragment : BaseFragment(),LifecycleOwner,OnItemClickListner {
     // TODO: Rename and change types of parameters
    // private val movieViewModel: MovieDataViewModel by viewModels()
     private val movieViewModel by activityViewModels<MovieDataViewModel>()
@@ -55,6 +56,7 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
     ): View? {
         // Inflate the layout for this fragment
         movieListView =  inflater.inflate(R.layout.fragment_movie_list, container, false)
+        mContainerId = container?.id?:-1
         return movieListView
     }
 
@@ -125,7 +127,7 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
         })
     }
     private fun initAdapter() {
-        movieListAdapter = MovieListAdapter(this@MovieListFragment.requireActivity(),arrayListOf())
+        movieListAdapter = MovieListAdapter(this@MovieListFragment.requireActivity(),arrayListOf(),this)
         recyclerView.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = movieListAdapter
@@ -170,6 +172,7 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
     }
 
 
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -188,5 +191,15 @@ class MovieListFragment : BaseFragment(),LifecycleOwner {
                     putString(ARG_PARAM2, param2)
                 }
             }
+    }
+
+    override fun navigateToDetail(rating: String) {
+        if(!TextUtils.isEmpty(rating)) {
+            var movieInfoDetailFragment = MovieInfoDetailFragment()
+            val mArgs = Bundle()
+            mArgs.putString("imdbId", rating)
+            movieInfoDetailFragment.arguments = mArgs
+            activity?.replaceFragment(movieInfoDetailFragment, mContainerId)
+        }
     }
 }
