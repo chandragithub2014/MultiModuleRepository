@@ -39,6 +39,7 @@ class MovieInfoDetailFragment : BaseFragment() {
     private var movieListDetailView: View? = null
     lateinit var toolbar: Toolbar
     private val movieViewModel by activityViewModels<MovieDataViewModel>()
+    private var switch_btn_status:Boolean = false
     var movie : Movie = Movie("","","","","",false,"","")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,13 +73,24 @@ class MovieInfoDetailFragment : BaseFragment() {
         toolbar = view.findViewById(R.id.toolBar) as Toolbar
         //setHasOptionsMenu(true)
         view.movie_fav.setOnCheckedChangeListener { compoundButton, b ->
+            switch_btn_status = b
 
+        }
+
+        view.save_btn.setOnClickListener {
             param1?.let {
-                movieViewModel.updateFavouriteMovie(b, it)
+                println("In Switch Checked Listener $switch_btn_status")
+                movieViewModel.updateFavouriteMovie(switch_btn_status, it)
+                activity?.supportFragmentManager?.popBackStack()
             }
+        }
+
+        view.cancel_btn.setOnClickListener {
+            activity?.supportFragmentManager?.popBackStack()
         }
         observeViewModel()
     }
+
 
     private fun observeViewModel(){
         movieViewModel.fetchLoadStatus().observe(viewLifecycleOwner, Observer {
@@ -100,10 +112,12 @@ class MovieInfoDetailFragment : BaseFragment() {
 
         movieViewModel.fetchMovieDetail().observe(viewLifecycleOwner, Observer {
             it?.let {
+                println("Favourite from DB is ${it.favourite}")
                 movie = it
                 movie_name.text = it.Title
                 movie_type.text = it.Type
                 movie_fav.isChecked = it.favourite
+                switch_btn_status = it.favourite
                 Glide
                     .with(this)
                     .load(it.Poster)
